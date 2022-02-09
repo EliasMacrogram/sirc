@@ -33,7 +33,7 @@ class Empresa
         $paginado = Paginacion($dataTotal['total'], $limite, $pagina);
 
         $inicio  = (($pagina - 1) * $limite);
-        $consulta = "SELECT * empresa where estado in ('A','I') LIMIT " . $inicio . "," . $limite;
+        $consulta = "SELECT * from empresa where estado in ('A','I') LIMIT " . $inicio . "," . $limite;
 
         $data = Conexion::buscarVariosRegistro($consulta);
         if ($data) {
@@ -77,7 +77,7 @@ class Empresa
         $telefono  = $_POST['telefono'];
         $correo    = $_POST['correo'];
 
-        $consulta = "UPDATE oficina set nombre = '$nombre', direccion = '$direccion', telefeono = '$telefono' correo = '$correo', fecha_actualizado = now(), usuario_actualizado = $cod_usuario where cod_empresa = $codigo ";
+        $consulta = "UPDATE empresa set nombre = '$nombre', direccion = '$direccion', telefono = '$telefono', correo = '$correo', fecha_actualizado = now(), usuario_actualizado = '$cod_usuario' where cod_empresa = $codigo ";
         $query = Conexion::UpdateRegistro($consulta);
         if ($query) {
             $respuesta['status'] = "correcto";

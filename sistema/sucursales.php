@@ -42,7 +42,7 @@ $cod_usuario = 1;
                     <div class="card-header pb-0"> </div>
 
                     <form class="form-control dropzone" id="formulario">
-                    <div class="card-header pb-0">    </div>
+                        <div class="card-header pb-0"> </div>
                         <div class="row">
                             <div class="col-6">
                                 <label class="form-label"> Nombre </label>
@@ -64,7 +64,7 @@ $cod_usuario = 1;
 
                         <div class="d-flex justify-content-end mt-4">
                             <!-- <button type="button" name="button" class="btn btn-light m-0">Cancel</button> -->
-                            <button type="button" id="Crear" name="button" class="btn bg-gradient-primary m-0 ms-2"> Crear </button>
+                            <button type="submit" name="button" class="btn bg-gradient-primary m-0 ms-2"> Crear </button>
                         </div>
                     </form>
 
@@ -148,11 +148,11 @@ $cod_usuario = 1;
 
                         </div>
 
+                        <div class="modal-footer">
+                            <button type="submit" name="button" class="btn bg-gradient-primary m-0 ms-2">Actualizar</button>
+                        </div>
 
                     </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-info" id="Actualizar" data-dismiss="modal">Actualizar</button>
                 </div>
             </div>
         </div>
@@ -164,7 +164,7 @@ $cod_usuario = 1;
     <?php include 'script.php' ?>
 
     <script>
-        var limite = "1";
+        var limite = "5";
         var pagina = "1";
 
         $('#Agregar').click(function() {
@@ -178,43 +178,50 @@ $cod_usuario = 1;
             cargarLista(limite, pagina);
         });
 
-        $('#Crear').click(function() {
-            if ($('#nombre').val() == "" || $('#direccion').val() == "" || $('#telefono').val() == "" || $('#correo').val() == "") {
-                swal("Alerta!", "Los campos son obligatorios", "warning");
-                return false;
-            }
-            var formData = new FormData(document.getElementById("formulario"));
-            formData.append('tipo', "CREAR");
-            formData.append('cod_usuario', $('#cod_usuario').val());
-
-            for (let [key, value] of formData.entries()) {
-                console.log(key, ':', value);
-            }
-
-            $.ajax({
-                url: "dist/ajax/sucursal.php",
-                type: "POST",
-                dataType: "json",
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                error: function(mensaje, exception) {
-                    console.log(mensaje.responseText);
-                    swal("ERROR", "Por favor recarga la pagina, si el problema persiste contacta con soporte", "error");
-                },
-                success: function(response) {
-                    console.log(response);
-                    if (response['status'] == 'correcto') {
-                        document.getElementById("formulario").reset();
-                        swal("Buen trabajo!", response['mensaje'], "success");
-                    } else if (response['status'] == 'informacion') {
-                        swal("Hey!", response['mensaje'], "info");
+        $("#formulario").submit(function(event) {
+            event.preventDefault();
+            var paso = true;
+            try {
+                $(this).find("input").each(function(index, item) {
+                    if ($(item).val().length == 0) {
+                        $(item).toggleClass("is-invalid");
+                        throw 'Debe llenar correctamente los campos';
                     } else {
-                        swal("error!", response['mensaje'], "error");
+                        $(item).removeClass("is-invalid")
                     }
-                }
-            });
+                });
+            } catch (error) {
+                swal("ERROR", error, "error");
+                paso = !paso
+            }
+
+            if (paso) {
+
+                $.ajax({
+                    url: "dist/ajax/sucursal.php",
+                    type: "POST",
+                    dataType: "json",
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    error: function(mensaje, exception) {
+                        console.log(mensaje.responseText);
+                        swal("ERROR", "Por favor recarga la pagina, si el problema persiste contacta con soporte", "error");
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        if (response['status'] == 'correcto') {
+                            document.getElementById("formulario").reset();
+                            swal("Buen trabajo!", response['mensaje'], "success");
+                        } else if (response['status'] == 'informacion') {
+                            swal("Hey!", response['mensaje'], "info");
+                        } else {
+                            swal("error!", response['mensaje'], "error");
+                        }
+                    }
+                });
+            }
         });
 
 
@@ -274,9 +281,9 @@ $cod_usuario = 1;
                 dataBody += `
                         <tr>
                             <td class="align-middle text-center"> <p class="text-secondary text-xxs font-weight-bolder"> ${nombre} </p>   </td>
-                            <td class="align-middle text-center"> <p class="text-secondary text-xxs font-weight-bolder">Online</p>   </td>
-                            <td class="align-middle text-center"> <p class="text-secondary text-xxs font-weight-bolder">Online</p>   </td>
-                            <td class="align-middle text-center"> <p class="text-secondary text-xxs font-weight-bolder">Online</p>   </td>
+                            <td class="align-middle text-center"> <p class="text-secondary text-xxs font-weight-bolder"> ${direccion} </p>   </td>
+                            <td class="align-middle text-center"> <p class="text-secondary text-xxs font-weight-bolder"> ${telefono} </p>   </td>
+                            <td class="align-middle text-center"> <p class="text-secondary text-xxs font-weight-bolder"> ${correo} </p>   </td>
                             <td class="align-middle text-center">   <button class="btn btn-info"   onclick="abrirModal(${codigo});"> <i class="fas fa-pencil-alt"></i> </button>   </td>
                             <td class="align-middle text-center">   <button class="btn btn-danger" onclick="eliminar(${codigo});"> <i class="fas fa-trash"></i>  </button>   </td>
                         </tr>
@@ -346,49 +353,59 @@ $cod_usuario = 1;
             });
         }
 
-        $('#Actualizar').click(function() {
-            if ($('#nombreEditar').val() == "" || $('#direccionEditar').val() == "" || $('#telefonoEditar').val() == "" || $('#correoEditar').val() == "") {
-                swal("Alerta!", "Los campos son obligatorios", "warning");
-                return false;
-            }
-            var formData = new FormData(document.getElementById("frmActualizar"));
-            formData.append('tipo', "ACTUALIZAR");
-            formData.append('cod_usuario', $('#cod_usuario').val());
-
-            for (let [key, value] of formData.entries()) {
-                console.log(key, ':', value);
-            }
-
-            $.ajax({
-                url: "dist/ajax/sucursal.php",
-                type: "POST",
-                dataType: "json",
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                error: function(mensaje, exception) {
-                    console.log(mensaje.responseText);
-                    swal("ERROR", "Por favor recarga la pagina, si el problema persiste contacta con soporte", "error");
-                },
-                success: function(response) {
-                    console.log(response);
-                    cargarLista(1, 1);
-                    if (response['status'] == 'correcto') {
-                        // document.getElementById("frmActualizar").reset();
-                        $('#modalEditar').modal('hide');
-                        swal("Buen trabajo!", response['mensaje'], "success");
-
-                    } else if (response['status'] == 'informacion') {
-                        $('#modalEditar').modal('hide');
-                        swal("hey", response['mensaje'], "info");
-
+        $("#frmActualizar").submit(function(event) {
+            event.preventDefault();
+            var paso = true;
+            try {
+                $(this).find("input").each(function(index, item) {
+                    if ($(item).val().length == 0) {
+                        $(item).toggleClass("is-invalid");
+                        throw 'Debe llenar correctamente los campos';
                     } else {
-                        $('#modalEditar').modal('hide');
-                        swal("error", response['mensaje'], "error");
+                        $(item).removeClass("is-invalid")
                     }
-                }
-            });
+                });
+            } catch (error) {
+                swal("ERROR", error, "error");
+                paso = !paso
+            }
+
+            if (paso) {
+                var formData = new FormData(document.getElementById("frmActualizar"));
+                formData.append('tipo', "ACTUALIZAR");
+                formData.append('cod_usuario', $('#cod_usuario').val());
+
+                $.ajax({
+                    url: "dist/ajax/sucursal.php",
+                    type: "POST",
+                    dataType: "json",
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    error: function(mensaje, exception) {
+                        console.log(mensaje.responseText);
+                        swal("ERROR", "Por favor recarga la pagina, si el problema persiste contacta con soporte", "error");
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        cargarLista(limite, 1);
+                        if (response['status'] == 'correcto') {
+                            // document.getElementById("frmActualizar").reset();
+                            $('#modalEditar').modal('hide');
+                            swal("Buen trabajo!", response['mensaje'], "success");
+
+                        } else if (response['status'] == 'informacion') {
+                            $('#modalEditar').modal('hide');
+                            swal("hey", response['mensaje'], "info");
+
+                        } else {
+                            $('#modalEditar').modal('hide');
+                            swal("error", response['mensaje'], "error");
+                        }
+                    }
+                });
+            }
         });
 
         $('#CerrarModalEditar').click(function() {

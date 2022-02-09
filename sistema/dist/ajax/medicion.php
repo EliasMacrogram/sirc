@@ -1,46 +1,40 @@
 <?php
-error_reporting(0);
-require_once "class/c_cargo.php";
+// error_reporting(0);
+require_once "../../conexion.php";
+require_once "class/c_medicion.php";
 
-$Tematica = new Tematica();
+$objeto = new Medicion();
 
 $tipo = $_POST['tipo'];
 switch($tipo){
     case "CREAR":
-        $cod_usuario = $_POST['cod_usuario'];        
-        $nombre    = htmlentities($_POST['nombre']);
 
-        $return    = $Tematica->crear($cod_usuario, $nombre);
+        $return    = $objeto->crear($_POST);
         break;   
 
     case "LISTA":
-        $limite       = $_POST['limite'];
-        $pagina       = $_POST['pagina'];
-        
-        $return = $Tematica->lista($limite,$pagina);
+                
+        $return = $objeto->lista($_POST);
         break;   
 
+    case "CONSULTAR":
+        
+        $return = $objeto->consultar($_POST);
+        break; 
+
     case "ACTUALIZAR":
-        $cod_usuario = $_POST['cod_usuario'];
-        $cod_medicion = $_POST['cod_medicion'];
-        $nombre    = htmlentities($_POST['nombre']);
     
-        $return    = $Tematica->actualizar($cod_usuario, $cod_medicion, $nombre);
+        $return    = $objeto->actualizar($_POST);
         break;   
 
     case "CAMBIAR_ESTADO":
-        $cod_usuario  = $_POST['cod_usuario'];
-        $cod_medicion = $_POST['cod_medicion'];
-        $estado       = $_POST['estado'];
-        
-        $return    = $Tematica->cambiarEstado($cod_usuario, $cod_medicion, $estado);
+       
+        $return    = $objeto->cambiarEstado($_POST);
         break;   
         
     case "ELIMINAR":
-        $cod_usuario = $_POST['cod_usuario'];    
-        $cod_medicion = $_POST['cod_medicion'];
 
-        $return    = $Tematica->eliminar($cod_usuario, $cod_medicion);
+        $return    = $objeto->eliminar($_POST);
         break;   
 }
 

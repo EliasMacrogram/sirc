@@ -149,15 +149,13 @@ $cod_usuario = 1;
                                 <label for="" class="col-form-label"> Correo </label>
                                 <input type="text" class="form-control" id="correoEditar" name="correo">
                             </div>
-
-
                         </div>
 
 
+                        <div class="modal-footer">
+                            <button  type="submit" name="button" class="btn bg-gradient-primary m-0 ms-2">Actualizar</button>
+                        </div>
                     </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-info" id="Actualizar" data-dismiss="modal">Actualizar</button>
                 </div>
             </div>
         </div>
@@ -186,17 +184,21 @@ $cod_usuario = 1;
 
         $("#formulario").submit(function(event) {
             event.preventDefault();
-            var paso = false;
-            $(this).find("input").each(function(index, item) {
-                if ($(item).val().length == 0) {
-                    $(item).toggleClass("is-invalid");
-                    // throw 'Debe llenar correctamente los campos';
-                    paso = false;
-                } else {
-                    $(item).removeClass("is-invalid")
-                    paso = true;
-                }
-            });
+            var paso = true;
+            try {
+                $(this).find("input").each(function(index, item) {
+                    if ($(item).val().length == 0) {
+                        $(item).toggleClass("is-invalid");
+                        throw 'Debe llenar correctamente los campos';
+                    } else {
+                        $(item).removeClass("is-invalid")
+                    }
+                });
+            } catch (error) {
+                swal("ERROR", error, "error");
+                paso = !paso
+            }
+
             if (paso) {
                 var formData = new FormData(document.getElementById("formulario"));
                 formData.append('tipo', "CREAR");
@@ -363,24 +365,27 @@ $cod_usuario = 1;
 
         $("#frmActualizar").submit(function(event) {
             event.preventDefault();
-            var paso = false;
-            $(this).find("input").each(function(index, item) {
-                if ($(item).val().length == 0) {
-                    $(item).toggleClass("is-invalid");
-                    // throw 'Debe llenar correctamente los campos';
-                    paso = false;
-                } else {
-                    $(item).removeClass("is-invalid")
-                    paso = true;
-                }
-            });
+            var paso = true;
+            try {
+                $(this).find("input").each(function(index, item) {
+                    if ($(item).val().length == 0) {
+                        $(item).toggleClass("is-invalid");
+                        throw 'Debe llenar correctamente los campos';
+                    } else {
+                        $(item).removeClass("is-invalid")
+                    }
+                });
+            } catch (error) {
+                swal("ERROR", error, "error");
+                paso = !paso
+            }
             if (paso) {
                 var formData = new FormData(document.getElementById("frmActualizar"));
                 formData.append('tipo', "ACTUALIZAR");
                 formData.append('cod_usuario', $('#cod_usuario').val());
 
                 $.ajax({
-                    url: "dist/ajax/oficina.php",
+                    url: "dist/ajax/empresa.php",
                     type: "POST",
                     dataType: "json",
                     data: formData,
@@ -424,7 +429,7 @@ $cod_usuario = 1;
             formData.append('codigo', codigo);
 
             $.ajax({
-                url: "dist/ajax/oficina.php",
+                url: "dist/ajax/empresa.php",
                 type: "POST",
                 dataType: "json",
                 data: formData,

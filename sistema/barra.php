@@ -20,8 +20,8 @@
                     <li class="nav-item d-flex align-items-center">
                         <a href="javascript:;" class="nav-link text-body font-weight-bold px-0">
                             <i class="fa fa-user me-sm-1"></i>
-                            <input type="hidden" name="cod_usuario" id="cod_usuario" value="<?php echo $cod_usuario ?>">
-                            <span class="d-sm-inline d-none"> Elias Reyes </span>
+                            <input type="hidden" name="cod_usuario" id="cod_usuario" value="<?php echo $_SESSION['datos_login']['cod_usuario'] ?>">
+                            <span class="d-sm-inline d-none"> <?php echo $_SESSION['datos_login']['usuario']; ?> </span>
                         </a>
                     </li>
                     <!-- <li class="nav-item d-flex align-items-center">

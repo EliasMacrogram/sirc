@@ -1,5 +1,9 @@
 <?php 
 // $cod_usuario = 1;
+require_once "conexion.php";
+if ($_SESSION['datos_login'] == "") {
+  header("Location: ../sistema/");
+}
 ?>
 
 <!DOCTYPE html>

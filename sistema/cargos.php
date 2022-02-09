@@ -1,6 +1,6 @@
 <?php
 require_once "conexion.php";
-$titulo = "Empresas";
+$titulo = "Cargos";
 $cod_usuario = 1;
 ?>
 
@@ -45,28 +45,15 @@ $cod_usuario = 1;
                     <form class="form-control dropzone" id="formulario">
                         <div class="card-header pb-0"> </div>
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-12">
                                 <label class="form-label"> Nombre </label>
                                 <input class="form-control" type="text" placeholder="Nombre" id="nombre" name="nombre">
                             </div>
-                            <div class="col-6">
-                                <label class="form-label"> Direcci&oacute;n </label>
-                                <input class="form-control" type="text" placeholder="Direcci&oacute;n" id="direccion" name="direccion">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label"> Tel&eacute;fono </label>
-                                <input class="form-control" type="email" placeholder="telefono" id="telefono" name="telefono">
-                            </div>
-                       
-                            <div class="col-6">
-                                <label class="form-label"> Correo </label>
-                                <input class="form-control" type="email" placeholder="Correo" id="correo" name="correo">
-                            </div>
-                            
+
                         </div>
 
                         <div class="d-flex justify-content-end mt-4">
-                            <button type="button" id="Crear" name="button" class="btn bg-gradient-primary m-0 ms-2"> Crear </button>
+                            <button type="submit" name="button" class="btn bg-gradient-primary m-0 ms-2"> Crear </button>
                         </div>
                     </form>
 
@@ -87,9 +74,6 @@ $cod_usuario = 1;
                                                 <thead>
                                                     <tr>
                                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre</th>
-                                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ">Direcci&oacute;n</th>
-                                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"> Tel&eacute;fono</th>
-                                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Correo</th>
                                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Editar</th>
                                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Eliminar</th>
                                                         <th class="text-secondary opacity-7"></th>
@@ -131,33 +115,17 @@ $cod_usuario = 1;
                         <input type="hidden" id="codigo" name="codigo" value="">
 
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-12">
                                 <label for="" class="col-form-label"> Nombre </label>
                                 <input type="text" class="form-control" id="nombreEditar" name="nombre">
                             </div>
-                            <div class="col-6">
-                                <label for="" class="col-form-label"> Direcci&oacute;n </label>
-                                <input type="text" class="form-control" id="direccionEditar" name="direccion">
-                            </div>
-                            
-                            <div class="col-6">
-                                <label for="" class="col-form-label">  Tel&eacute;fono </label>
-                                <input type="text" class="form-control" id="telefonoEditar" name="telefono">
-                            </div>
-
-                            <div class="col-6">
-                                <label for="" class="col-form-label"> Correo </label>
-                                <input type="text" class="form-control" id="correoEditar" name="correo">
-                            </div>
-                    
-
                         </div>
 
 
+                        <div class="modal-footer">
+                            <button type="submit" name="button" class="btn bg-gradient-primary m-0 ms-2">Actualizar</button>
+                        </div>
                     </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-info" id="Actualizar" data-dismiss="modal">Actualizar</button>
                 </div>
             </div>
         </div>
@@ -183,45 +151,56 @@ $cod_usuario = 1;
             cargarLista(limite, pagina);
         });
 
-        $('#Crear').click(function() {
-            if ($('#nombre').val() == "" || $('#direccion').val() == "" || $('#telefono').val() == "" || $('#correo').val() == "") {
-                swal("Alerta!", "Los campos son obligatorios", "warning");
-                return false;
-            }
-            var formData = new FormData(document.getElementById("formulario"));
-            formData.append('tipo', "CREAR");
-            formData.append('cod_usuario', $('#cod_usuario').val());
 
-            for (let [key, value] of formData.entries()) {
-                console.log(key, ':', value);
-            }
-
-            $.ajax({
-                url: "dist/ajax/oficina.php",
-                type: "POST",
-                dataType: "json",
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                error: function(mensaje, exception) {
-                    console.log(mensaje.responseText);
-                    swal("ERROR", "Por favor recarga la pagina, si el problema persiste contacta con soporte", "error");
-                },
-                success: function(response) {
-                    console.log(response);
-                    if (response['status'] == 'correcto') {
-                        document.getElementById("formulario").reset();
-                        swal("Buen trabajo!", response['mensaje'], "success");
-                    } else if (response['status'] == 'informacion') {
-                        swal("Hey!", response['mensaje'], "info");
+        $("#formulario").submit(function(event) {
+            event.preventDefault();
+            var paso = true;
+            try {
+                $(this).find("input").each(function(index, item) {
+                    if ($(item).val().length == 0) {
+                        $(item).toggleClass("is-invalid");
+                        throw 'Debe llenar correctamente los campos';
                     } else {
-                        swal("error!", response['mensaje'], "error");
+                        $(item).removeClass("is-invalid")
                     }
-                }
-            });
-        });
+                });
+            } catch (error) {
+                swal("ERROR", error, "error");
+                paso = !paso
+            }
 
+            if (paso) {
+                var formData = new FormData(document.getElementById("formulario"));
+                formData.append('tipo', "CREAR");
+                formData.append('cod_usuario', $('#cod_usuario').val());
+
+                $.ajax({
+                    url: "dist/ajax/cargo.php",
+                    type: "POST",
+                    dataType: "json",
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    error: function(mensaje, exception) {
+                        console.log(mensaje.responseText);
+                        swal("ERROR", "Por favor recarga la pagina, si el problema persiste contacta con soporte", "error");
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        if (response['status'] == 'correcto') {
+                            document.getElementById("formulario").reset();
+                            swal("Buen trabajo!", response['mensaje'], "success");
+                        } else if (response['status'] == 'informacion') {
+                            swal("Hey!", response['mensaje'], "info");
+                        } else {
+                            swal("error!", response['mensaje'], "error");
+                        }
+                    }
+                });
+            }
+
+        });
 
         // LISTA
         function cargarLista(limite, pagina) {
@@ -238,7 +217,7 @@ $cod_usuario = 1;
             $.ajax({
                 beforeSend: function() {},
                 type: "POST",
-                url: "dist/ajax/oficina.php",
+                url: "dist/ajax/cargo.php",
                 dataType: 'json',
                 data: formData,
                 cache: false,
@@ -273,18 +252,12 @@ $cod_usuario = 1;
 
             var dataBody = "";
             $.each(data, function(item, valor) {
-                codigo = data[item]['cod_oficina'];
-                nombre = data[item]['oficina'];
-                descripcion = data[item]['descripcion'];
-                correo = data[item]['correo'];
-                sucursal = data[item]['sucursal'];
+                codigo = data[item]['cod_cargo'];
+                nombre = data[item]['nombre'];
 
                 dataBody += `
                         <tr>
                             <td class="align-middle text-center"> <p class="text-secondary text-xxs font-weight-bolder"> ${nombre} </p>   </td>
-                            <td class="align-middle text-center"> <p class="text-secondary text-xxs font-weight-bolder"> ${descripcion} </p>   </td>
-                            <td class="align-middle text-center"> <p class="text-secondary text-xxs font-weight-bolder"> ${correo} </p>   </td>
-                            <td class="align-middle text-center"> <p class="text-secondary text-xxs font-weight-bolder"> ${sucursal} </p>   </td>
                             <td class="align-middle text-center">   <button class="btn btn-info"   onclick="abrirModal(${codigo});"> <i class="fas fa-pencil-alt"></i> </button>   </td>
                             <td class="align-middle text-center">   <button class="btn btn-danger" onclick="eliminar(${codigo});"> <i class="fas fa-trash"></i>  </button>   </td>
                         </tr>
@@ -322,7 +295,7 @@ $cod_usuario = 1;
             $.ajax({
                 beforeSend: function() {},
                 type: "POST",
-                url: "dist/ajax/oficina.php",
+                url: "dist/ajax/cargo.php",
                 dataType: 'json',
                 data: formData,
                 cache: false,
@@ -338,9 +311,6 @@ $cod_usuario = 1;
                         $('#modalEditar').modal('show');
                         $('#codigo').val(response['codigo']);
                         $('#nombreEditar').val(response['nombre']);
-                        $('#descripcionEditar').val(response['descripcion']);
-                        $('#correoEditar').val(response['correo']);
-                        $('#sucursalEditar').val(response['cod_sucursal']);
 
                     } else if (response['status'] == 'informacion') {
                         $('#modalEditar').modal('hide');
@@ -354,44 +324,58 @@ $cod_usuario = 1;
             });
         }
 
-        $('#Actualizar').click(function() {
-            if ($('#nombreEditar').val() == "" || $('#descripcionEditar').val() == "" || $('#correoEditar').val() == "" || $('#sucursalEditar').val() == "") {
-                swal("Alerta!", "Los campos son obligatorios", "warning");
-                return false;
-            }
-            var formData = new FormData(document.getElementById("frmActualizar"));
-            formData.append('tipo', "ACTUALIZAR");
-            formData.append('cod_usuario', $('#cod_usuario').val());
-
-            $.ajax({
-                url: "dist/ajax/oficina.php",
-                type: "POST",
-                dataType: "json",
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                error: function(mensaje, exception) {
-                    console.log(mensaje.responseText);
-                    swal("ERROR", "Por favor recarga la pagina, si el problema persiste contacta con soporte", "error");
-                },
-                success: function(response) {
-                    console.log(response);
-                    cargarLista(limite, 1);
-                    if (response['status'] == 'correcto') {
-                        $('#modalEditar').modal('hide');
-                        swal("Buen trabajo!", response['mensaje'], "success");
-
-                    } else if (response['status'] == 'informacion') {
-                        $('#modalEditar').modal('hide');
-                        swal("hey", response['mensaje'], "info");
-
+        $("#frmActualizar").submit(function(event) {
+            event.preventDefault();
+            var paso = true;
+            try {
+                $(this).find("input").each(function(index, item) {
+                    if ($(item).val().length == 0) {
+                        $(item).toggleClass("is-invalid");
+                        throw 'Debe llenar correctamente los campos';
                     } else {
-                        $('#modalEditar').modal('hide');
-                        swal("error", response['mensaje'], "error");
+                        $(item).removeClass("is-invalid")
                     }
-                }
-            });
+                });
+            } catch (error) {
+                swal("ERROR", error, "error");
+                paso = !paso
+            }
+            if (paso) {
+                var formData = new FormData(document.getElementById("frmActualizar"));
+                formData.append('tipo', "ACTUALIZAR");
+                formData.append('cod_usuario', $('#cod_usuario').val());
+
+                $.ajax({
+                    url: "dist/ajax/cargo.php",
+                    type: "POST",
+                    dataType: "json",
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    error: function(mensaje, exception) {
+                        console.log(mensaje.responseText);
+                        swal("ERROR", "Por favor recarga la pagina, si el problema persiste contacta con soporte", "error");
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        cargarLista(limite, 1);
+                        if (response['status'] == 'correcto') {
+                            $('#modalEditar').modal('hide');
+                            swal("Buen trabajo!", response['mensaje'], "success");
+
+                        } else if (response['status'] == 'informacion') {
+                            $('#modalEditar').modal('hide');
+                            swal("hey", response['mensaje'], "info");
+
+                        } else {
+                            $('#modalEditar').modal('hide');
+                            swal("error", response['mensaje'], "error");
+                        }
+                    }
+                });
+            }
+
         });
 
         $('#CerrarModalEditar').click(function() {
@@ -406,7 +390,7 @@ $cod_usuario = 1;
             formData.append('codigo', codigo);
 
             $.ajax({
-                url: "dist/ajax/oficina.php",
+                url: "dist/ajax/cargo.php",
                 type: "POST",
                 dataType: "json",
                 data: formData,

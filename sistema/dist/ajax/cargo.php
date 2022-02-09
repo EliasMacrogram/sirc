@@ -1,46 +1,40 @@
 <?php
-error_reporting(0);
+// error_reporting(0);
+require_once "../../conexion.php";
 require_once "class/c_cargo.php";
 
-$Tematica = new Tematica();
+$objeto = new Cargos();
 
 $tipo = $_POST['tipo'];
 switch($tipo){
     case "CREAR":
-        $cod_usuario = $_POST['cod_usuario'];        
-        $nombre    = htmlentities($_POST['nombre']);
 
-        $return    = $Tematica->crear($cod_usuario, $nombre);
+        $return    = $objeto->crear($_POST);
         break;   
 
     case "LISTA":
-        $limite       = $_POST['limite'];
-        $pagina       = $_POST['pagina'];
+       
+        $return = $objeto->lista($_POST);
+        break;   
+
+    case "CONSULTAR":
         
-        $return = $Tematica->lista($limite,$pagina);
+        $return    = $objeto->consultar($_POST);
         break;   
 
     case "ACTUALIZAR":
-        $cod_usuario = $_POST['cod_usuario'];
-        $cod_cargo = $_POST['cod_cargo'];
-        $nombre    = htmlentities($_POST['nombre']);
-    
-        $return    = $Tematica->actualizar($cod_usuario, $cod_cargo, $nombre);
+        
+        $return    = $objeto->actualizar($_POST);
         break;   
 
     case "CAMBIAR_ESTADO":
-        $cod_usuario  = $_POST['cod_usuario'];
-        $cod_cargo = $_POST['cod_cargo'];
-        $estado       = $_POST['estado'];
         
-        $return    = $Tematica->cambiarEstado($cod_usuario, $cod_cargo, $estado);
+        $return    = $objeto->cambiarEstado($_POST);
         break;   
         
     case "ELIMINAR":
-        $cod_usuario = $_POST['cod_usuario'];    
-        $cod_cargo = $_POST['cod_cargo'];
-
-        $return    = $Tematica->eliminar($cod_usuario, $cod_cargo);
+       
+        $return    = $objeto->eliminar($_POST);
         break;   
 }
 

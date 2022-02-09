@@ -1,29 +1,32 @@
 <?php
-require_once "../../conexion.php";
 class Sucursal
 {
 
-    function crear($cod_usuario, $nombre, $direccion, $telefono, $correo)
+    function crear($datos)
     {
-        if ($cod_usuario == "") {
-            $respuesta['status'] = "informacion";
-            $respuesta['mensaje'] = "Por favor vuelve a iniciar sesion";
+        $cod_usuario = $_POST['cod_usuario'];
+        $nombre    = htmlentities($_POST['nombre']);
+        $direccion = htmlentities($_POST['direccion']);
+        $telefono  = $_POST['telefono'];
+        $correo    = $_POST['correo'];
+
+        $consulta = "INSERT INTO sucursal (nombre, direccion, telefono, correo, estado, fecha_creado, usuario_creado)  VALUES  ('$nombre','$direccion','$telefono', '$correo', 'A', now(),'$cod_usuario')";
+        $query = Conexion::UpdateRegistro($consulta);
+        if ($query) {
+            $respuesta['status'] = "correcto";
+            $respuesta['mensaje'] = "Sucursal agregada";
         } else {
-            $consulta = "INSERT INTO sucursal (nombre, direccion, telefono, correo, estado, fecha_creado, usuario_creado)  VALUES  ('$nombre','$direccion','$telefono', '$correo', 'A', now(),'$cod_usuario')";
-            $query = Conexion::UpdateRegistro($consulta);
-            if ($query) {
-                $respuesta['status'] = "correcto";
-                $respuesta['mensaje'] = "Sucursal agregada";
-            } else {
-                $respuesta['status'] = "error";
-                $respuesta['mensaje'] = "Error al crear la sucursal, vuelve a intentarlo";
-            }
+            $respuesta['status'] = "error";
+            $respuesta['mensaje'] = "Error al crear la sucursal, vuelve a intentarlo";
         }
         return $respuesta;
     }
 
-    function lista($limite, $pagina)
+    function lista($datos)
     {
+        $limite       = $_POST['limite'];
+        $pagina       = $_POST['pagina'];
+
         $dataTotal = Conexion::buscarRegistro("SELECT count(*) total FROM sucursal where estado in ('A','I') ");
         require 'paginado.php';
         $paginado = Paginacion($dataTotal['total'], $limite, $pagina);
@@ -46,8 +49,10 @@ class Sucursal
         return $respuesta;
     }
 
-    function consultar($codigo)
+    function consultar($datos)
     {
+        $codigo = $_POST['codigo'];
+
         $consulta = "SELECT * from sucursal where cod_sucursal = $codigo ";
         $data = Conexion::buscarRegistro($consulta);
         if ($data) {
@@ -64,77 +69,77 @@ class Sucursal
         return $respuesta;
     }
 
-    function actualizar($cod_usuario, $cod_sucursal, $nombre, $direccion, $telefono, $correo)
+    function actualizar($datos)
     {
-        if ($cod_usuario == "") {
-            $respuesta['status'] = "informacion";
-            $respuesta['mensaje'] = "Por favor vuelve a iniciar sesion";
-        } else {
-            if (filter_var($correo, FILTER_VALIDATE_EMAIL)) {
-                if(is_numeric($telefono)){
-                    $consulta = "UPDATE sucursal set nombre = '$nombre', direccion = '$direccion', telefono = '$telefono', correo = '$correo', fecha_actualizado = now(), usuario_actualizado = $cod_usuario where cod_sucursal = $cod_sucursal ";
-                    $query = Conexion::UpdateRegistro($consulta);
-                    if ($query) {
-                        $respuesta['status'] = "correcto";
-                        $respuesta['mensaje'] = "Sucursal actualizada";
-                    } else {
-                        $respuesta['status'] = "error";
-                        $respuesta['mensaje'] = "Error al actualizar, vuelve a intentarlo";
-                    }
-                }else{
+        $cod_usuario  = $_POST['cod_usuario'];
+        $codigo = $_POST['codigo'];
+
+        $nombre    = htmlentities($_POST['nombre']);
+        $direccion = htmlentities($_POST['direccion']);
+        $telefono  = $_POST['telefono'];
+        $correo    = $_POST['correo'];
+
+        if (filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+            if (is_numeric($telefono)) {
+                $consulta = "UPDATE sucursal set nombre = '$nombre', direccion = '$direccion', telefono = '$telefono', correo = '$correo', fecha_actualizado = now(), usuario_actualizado = $cod_usuario where cod_sucursal = $codigo ";
+                $query = Conexion::UpdateRegistro($consulta);
+                if ($query) {
+                    $respuesta['status'] = "correcto";
+                    $respuesta['mensaje'] = "Sucursal actualizada";
+                } else {
                     $respuesta['status'] = "error";
-                    $respuesta['mensaje'] = "No se aceptan letras en el campo del telefono";
+                    $respuesta['mensaje'] = "Error al actualizar, vuelve a intentarlo";
                 }
-            }else{
+            } else {
                 $respuesta['status'] = "error";
-                $respuesta['mensaje'] = "El correo no tiene el formato correcto";
+                $respuesta['mensaje'] = "No se aceptan letras en el campo del telefono";
             }
+        } else {
+            $respuesta['status'] = "error";
+            $respuesta['mensaje'] = "El correo no tiene el formato correcto";
         }
         return $respuesta;
     }
 
-    function cambiarEstado($cod_usuario, $cod_sucursal, $estado)
+    function cambiarEstado($datos)
     {
-        if ($cod_usuario == "") {
-            $respuesta['status'] = "informacion";
-            $respuesta['mensaje'] = "Por favor vuelve a iniciar sesion";
+        $cod_usuario  = $_POST['cod_usuario'];
+        $codigo = $_POST['codigo'];
+        $estado       = $_POST['estado'];
+
+        $mensaje = "";
+        if ($estado == 'A') {
+            $estado = 'I';
+            $mensaje = "La sucursal esta desactivada";
         } else {
-            $mensaje = "";
-            if ($estado == 'A') {
-                $estado = 'I';
-                $mensaje = "La sucursal esta desactivada";
-            } else {
-                $estado = 'A';
-                $mensaje = "La sucursal esta activada";
-            }
-            $consulta = "UPDATE  sucursal set estado = '$estado', fecha_actualizado = now(), usuario_actualizado = $cod_usuario where cod_sucursal = $cod_sucursal ";
-            $query = Conexion::UpdateRegistro($consulta);
-            if ($query) {
-                $respuesta['status'] = "correcto";
-                $respuesta['mensaje'] = $mensaje;
-            } else {
-                $respuesta['status'] = "error";
-                $respuesta['mensaje'] = "Error, no se pudo cambiar el estado de la sucursal, vuelve a intentarlo";
-            }
+            $estado = 'A';
+            $mensaje = "La sucursal esta activada";
+        }
+        $consulta = "UPDATE  sucursal set estado = '$estado', fecha_actualizado = now(), usuario_actualizado = $cod_usuario where cod_sucursal = $codigo ";
+        $query = Conexion::UpdateRegistro($consulta);
+        if ($query) {
+            $respuesta['status'] = "correcto";
+            $respuesta['mensaje'] = $mensaje;
+        } else {
+            $respuesta['status'] = "error";
+            $respuesta['mensaje'] = "Error, no se pudo cambiar el estado de la sucursal, vuelve a intentarlo";
         }
         return $respuesta;
     }
 
-    function eliminar($cod_usuario, $cod_sucursal)
+    function eliminar($datos)
     {
-        if ($cod_usuario == "") {
-            $respuesta['status'] = "informacion";
-            $respuesta['mensaje'] = "Por favor vuelve a iniciar sesion";
+        $cod_usuario = $_POST['cod_usuario'];
+        $codigo = $_POST['codigo'];
+        
+        $consulta = "UPDATE  sucursal set estado = 'D', fecha_eliminado = now(), usuario_eliminado = $cod_usuario where cod_sucursal = $codigo ";
+        $query = Conexion::UpdateRegistro($consulta);
+        if ($query) {
+            $respuesta['status'] = "correcto";
+            $respuesta['mensaje'] = "Sucursal eliminada";
         } else {
-            $consulta = "UPDATE  sucursal set estado = 'D', fecha_eliminado = now(), usuario_eliminado = $cod_usuario where cod_sucursal = $cod_sucursal ";
-            $query = Conexion::UpdateRegistro($consulta);
-            if ($query) {
-                $respuesta['status'] = "correcto";
-                $respuesta['mensaje'] = "Sucursal eliminada";
-            } else {
-                $respuesta['status'] = "error";
-                $respuesta['mensaje'] = "Error al eliminar, vuelve a intentarlo";
-            }
+            $respuesta['status'] = "error";
+            $respuesta['mensaje'] = "Error al eliminar, vuelve a intentarlo";
         }
         return $respuesta;
     }

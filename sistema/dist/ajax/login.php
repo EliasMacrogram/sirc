@@ -1,5 +1,6 @@
 <?php
 // error_reporting(0);
+require_once "../../conexion.php";
 require_once "class/c_login.php";
 require_once "cryptDecrypt.php";
 
@@ -8,14 +9,11 @@ $objeto = new Login();
 $tipo = $_POST['tipo'];
 switch($tipo){
     case "INICIAR_SESION":
-        $usuario  = $_POST['usuario'];
-        $password = $_POST['password'];
-        $return   = $objeto->iniciarSesion($usuario,$password);
+        $return   = $objeto->iniciarSesion($_POST);
         break;   
         
     case "RECUPERAR_PASSWORD":
-        $correo = $_POST['correo'];
-        $return = $objeto->recuperarPassword($correo);
+        $return = $objeto->recuperarPassword($_POST);
         break;   
 
     case "CREAR":

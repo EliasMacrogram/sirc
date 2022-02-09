@@ -74,7 +74,7 @@ $cod_usuario = 1;
                         </div>
 
                         <div class="d-flex justify-content-end mt-4">
-                            <button type="button" id="Crear" name="button" class="btn bg-gradient-primary m-0 ms-2"> Crear </button>
+                            <button type="submit" name="button" class="btn bg-gradient-primary m-0 ms-2"> Crear </button>
                         </div>
                     </form>
 
@@ -168,12 +168,12 @@ $cod_usuario = 1;
 
                         </div>
 
-
+                        <div class="modal-footer">
+                            <button type="submit" name="button" class="btn bg-gradient-primary m-0 ms-2">Actualizar</button>
+                        </div>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-info" id="Actualizar" data-dismiss="modal">Actualizar</button>
-                </div>
+
             </div>
         </div>
     </div>
@@ -198,43 +198,57 @@ $cod_usuario = 1;
             cargarLista(limite, pagina);
         });
 
-        $('#Crear').click(function() {
-            if ($('#nombre').val() == "" || $('#descripcion').val() == "" || $('#correo').val() == "" || $('#sucursal').val() == "") {
-                swal("Alerta!", "Los campos son obligatorios", "warning");
-                return false;
-            }
-            var formData = new FormData(document.getElementById("formulario"));
-            formData.append('tipo', "CREAR");
-            formData.append('cod_usuario', $('#cod_usuario').val());
 
-            for (let [key, value] of formData.entries()) {
-                console.log(key, ':', value);
-            }
-
-            $.ajax({
-                url: "dist/ajax/oficina.php",
-                type: "POST",
-                dataType: "json",
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                error: function(mensaje, exception) {
-                    console.log(mensaje.responseText);
-                    swal("ERROR", "Por favor recarga la pagina, si el problema persiste contacta con soporte", "error");
-                },
-                success: function(response) {
-                    console.log(response);
-                    if (response['status'] == 'correcto') {
-                        document.getElementById("formulario").reset();
-                        swal("Buen trabajo!", response['mensaje'], "success");
-                    } else if (response['status'] == 'informacion') {
-                        swal("Hey!", response['mensaje'], "info");
+        $("#formulario").submit(function(event) {
+            event.preventDefault();
+            var paso = true;
+            try {
+                $(this).find("input").each(function(index, item) {
+                    if ($(item).val().length == 0) {
+                        $(item).toggleClass("is-invalid");
+                        throw 'Debe llenar correctamente los campos';
                     } else {
-                        swal("error!", response['mensaje'], "error");
+                        $(item).removeClass("is-invalid")
                     }
-                }
-            });
+                });
+
+                $(this).find("select#sucursal").each(function(index, item) {
+                    if ($(item).val() == 0 || $(item).val() == null) {
+                        throw 'Debes escoger opciones';
+                    }
+                })
+
+            } catch (error) {
+                swal("ERROR", error, "error");
+                paso = !paso
+            }
+
+            if (paso) {
+                $.ajax({
+                    url: "dist/ajax/oficina.php",
+                    type: "POST",
+                    dataType: "json",
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    error: function(mensaje, exception) {
+                        console.log(mensaje.responseText);
+                        swal("ERROR", "Por favor recarga la pagina, si el problema persiste contacta con soporte", "error");
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        if (response['status'] == 'correcto') {
+                            document.getElementById("formulario").reset();
+                            swal("Buen trabajo!", response['mensaje'], "success");
+                        } else if (response['status'] == 'informacion') {
+                            swal("Hey!", response['mensaje'], "info");
+                        } else {
+                            swal("error!", response['mensaje'], "error");
+                        }
+                    }
+                });
+            }
         });
 
 
@@ -369,44 +383,64 @@ $cod_usuario = 1;
             });
         }
 
-        $('#Actualizar').click(function() {
-            if ($('#nombreEditar').val() == "" || $('#descripcionEditar').val() == "" || $('#correoEditar').val() == "" || $('#sucursalEditar').val() == "") {
-                swal("Alerta!", "Los campos son obligatorios", "warning");
-                return false;
-            }
-            var formData = new FormData(document.getElementById("frmActualizar"));
-            formData.append('tipo', "ACTUALIZAR");
-            formData.append('cod_usuario', $('#cod_usuario').val());
-
-            $.ajax({
-                url: "dist/ajax/oficina.php",
-                type: "POST",
-                dataType: "json",
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                error: function(mensaje, exception) {
-                    console.log(mensaje.responseText);
-                    swal("ERROR", "Por favor recarga la pagina, si el problema persiste contacta con soporte", "error");
-                },
-                success: function(response) {
-                    console.log(response);
-                    cargarLista(limite, 1);
-                    if (response['status'] == 'correcto') {
-                        $('#modalEditar').modal('hide');
-                        swal("Buen trabajo!", response['mensaje'], "success");
-
-                    } else if (response['status'] == 'informacion') {
-                        $('#modalEditar').modal('hide');
-                        swal("hey", response['mensaje'], "info");
-
+        $("#frmActualizar").submit(function(event) {
+            event.preventDefault();
+            var paso = true;
+            try {
+                $(this).find("input").each(function(index, item) {
+                    if ($(item).val().length == 0) {
+                        $(item).toggleClass("is-invalid");
+                        throw 'Debe llenar correctamente los campos';
                     } else {
-                        $('#modalEditar').modal('hide');
-                        swal("error", response['mensaje'], "error");
+                        $(item).removeClass("is-invalid")
                     }
-                }
-            });
+                });
+
+                $(this).find("select#sucursalEditar").each(function(index, item) {
+                    if ($(item).val() == 0 || $(item).val() == null) {
+                        throw 'Debes escoger opciones';
+                    }
+                });
+            } catch (error) {
+                swal("ERROR", error, "error");
+                paso = !paso
+            }
+
+            if (paso) {
+                var formData = new FormData(document.getElementById("frmActualizar"));
+                formData.append('tipo', "ACTUALIZAR");
+                formData.append('cod_usuario', $('#cod_usuario').val());
+                
+                $.ajax({
+                    url: "dist/ajax/oficina.php",
+                    type: "POST",
+                    dataType: "json",
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    error: function(mensaje, exception) {
+                        console.log(mensaje.responseText);
+                        swal("ERROR", "Por favor recarga la pagina, si el problema persiste contacta con soporte", "error");
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        cargarLista(limite, 1);
+                        if (response['status'] == 'correcto') {
+                            $('#modalEditar').modal('hide');
+                            swal("Buen trabajo!", response['mensaje'], "success");
+
+                        } else if (response['status'] == 'informacion') {
+                            $('#modalEditar').modal('hide');
+                            swal("hey", response['mensaje'], "info");
+
+                        } else {
+                            $('#modalEditar').modal('hide');
+                            swal("error", response['mensaje'], "error");
+                        }
+                    }
+                });
+            }
         });
 
         $('#CerrarModalEditar').click(function() {

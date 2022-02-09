@@ -1,10 +1,14 @@
 <?php
-require_once "../../conexion.php";
+
 class Login
 {
 
-    function iniciarSesion($usuario, $password)
+    function iniciarSesion($datos)
     {
+        $usuario = $_POST['usuario'];
+        $rijndael = new RijndaelOpenSSL();
+        $password = base64_encode($rijndael->encrypt($_POST['password'], "F@R_pa$$"));
+
         $query = Conexion::buscarRegistro("SELECT * from usuarios where usuario = '$usuario' and password = '$password' ");
         if ($query) {
             $respuesta['status'] = "correcto";
@@ -13,20 +17,21 @@ class Login
                 // 'iduser'      => $query['id_usuario'],
                 'cod_usuario' => $query['cod_usuario'],
                 'cod_rol'     => $query['cod_rol'],
-                'cod_empresa' => $query['cod_empresa'],
+                // 'cod_empresa' => $query['cod_empresa'],
                 'usuario'     => $query['usuario'],
                 'nombres'     => $query['nombres'],
                 'correo'      => $query['correo']
             );
         } else {
-            $respuesta['status'] = "correcto";
+            $respuesta['status'] = "error";
             $respuesta['mensaje'] = "Este usuario no existe en el sistema";
         }
         return $respuesta;
     }
 
-    function recuperarPassword($correo)
+    function recuperarPassword($datos)
     {
+        $correo = $_POST['correo'];
         $data = Conexion::buscarRegistro("SELECT * from usuarios where correo = '$correo' ");
         if ($data) {
             $password = rand(50, 10000);

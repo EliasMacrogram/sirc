@@ -1,4 +1,5 @@
 <?php
+require_once "../../conexion.php";
 require_once "class/c_sucursal.php";
 
 $Sucursal = new Sucursal();
@@ -6,54 +7,35 @@ $Sucursal = new Sucursal();
 $tipo = $_POST['tipo'];
 switch($tipo){
     case "CREAR":
-        $cod_usuario = $_POST['cod_usuario'];
-        
-        $nombre    = htmlentities($_POST['nombre']);
-        $direccion = htmlentities($_POST['direccion']);
-        $telefono  = $_POST['telefono'];
-        $correo    = $_POST['correo'];
-
-        $return    = $Sucursal->crear($cod_usuario, $nombre, $direccion, $telefono, $correo);
+     
+        $return    = $Sucursal->crear($_POST);
         break;   
  
     case "LISTA":
-        $limite       = $_POST['limite'];
-        $pagina       = $_POST['pagina'];
-        
-        $return = $Sucursal->lista($limite,$pagina);
+       
+        $return = $Sucursal->lista($_POST);
         break;   
     
     case "CONSULTAR":
-        $codigo = $_POST['codigo'];
-        $return = $Sucursal->consultar($codigo);
+        
+        $return = $Sucursal->consultar($_POST);
 
         break;   
 
     case "ACTUALIZAR":
-        $cod_usuario  = $_POST['cod_usuario'];
-        $codigo = $_POST['codigo'];
-          
-        $nombre    = htmlentities($_POST['nombre']);
-        $direccion = htmlentities($_POST['direccion']);
-        $telefono  = $_POST['telefono'];
-        $correo    = $_POST['correo'];
     
-        $return    = $Sucursal->actualizar($cod_usuario, $codigo, $nombre, $direccion, $telefono, $correo);
+        $return    = $Sucursal->actualizar($_POST);
         break;   
 
     case "CAMBIAR_ESTADO":
-        $cod_usuario  = $_POST['cod_usuario'];
-        $codigo = $_POST['codigo'];
-        $estado       = $_POST['estado'];
+       
         
-        $return    = $Sucursal->cambiarEstado($cod_usuario, $codigo, $estado);
+        $return    = $Sucursal->cambiarEstado($_POST);
         break;   
         
     case "ELIMINAR":
-        $cod_usuario = $_POST['cod_usuario'];    
-        $codigo = $_POST['codigo'];
 
-        $return    = $Sucursal->eliminar($cod_usuario, $codigo);
+        $return    = $Sucursal->eliminar($_POST);
         break;   
 }
 
