@@ -1,10 +1,10 @@
-<?php 
+<?php
 require_once "conexion.php";
 session_start();
 if ($_SESSION['datos_login'] == "") {
-  header("Location: ../sistema/");
+    header("Location: ../sistema/");
 }
-$titulo = "Oficinas";
+$titulo = "Preguntas";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -30,9 +30,12 @@ $titulo = "Oficinas";
 
     <div class="col-lg-12 col-12">
         <div class="row">
-            <div class="col-4">
+            <div class="col-12">
                 <button id="Agregar" class="btn btn-info"> Agregar</button>
                 <button id="Lista" class="btn btn-primary"> Lista</button>
+
+                <input type="button" value="Duplicar" class="btn btn-success" id="btnDuplicar">
+                <input type="button" value="Eliminar" class="btn btn-danger" id="btnEliminarDuplicado">
             </div>
         </div>
     </div>
@@ -46,34 +49,74 @@ $titulo = "Oficinas";
 
                     <form class="form-control dropzone" id="formulario">
                         <div class="card-header pb-0"> </div>
-                        <div class="row">
-                            <div class="col-6">
-                                <label class="form-label"> Nombre </label>
-                                <input class="form-control" type="text" placeholder="Nombre" id="nombre" name="nombre">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label"> Descripci&oacute;n </label>
-                                <input class="form-control" type="text" placeholder="Descripci&oacute;n" id="descripcion" name="descripcion">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label"> Correo </label>
-                                <input class="form-control" type="email" placeholder="Correo" id="correo" name="correo">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label"> Sucursal </label>
-                                <select name="sucursal" id="sucursal" class="form-control">
-                                    <option value="">Seleccione una sucursal</option>
-                                    <?php
-                                    $consulta = "SELECT * from sucursal where estado = 'A' ";
-                                    $data = Conexion::buscarVariosRegistro($consulta);
-                                    if ($data) {
-                                        foreach ($data as $d) { ?>
-                                            <option value="<?php echo $d['cod_sucursal'] ?>"> <?php echo $d['nombre'] ?> </option>
-                                    <?php }
-                                    } ?>
-                                </select>
-                            </div>
-                        </div>
+                        <table>
+                            <tbody id="formPr">
+                                <tr>
+                                    <td>
+                                        <div id="frm1" class="row">
+
+                                            <div class="col-6">
+                                                <label class="form-label"> Pregunta </label>
+                                                <input class="form-control" type="text" placeholder="Pregunta" id="pregunta" name="pregunta[]">
+                                            </div>
+
+                                            <div class="col-6">
+                                                <label class="form-label"> Descripci&oacute;n </label>
+                                                <input class="form-control" type="text" placeholder="Descripci&oacute;n" id="descripcion" name="descripcion[]">
+                                            </div>
+
+                                            <div class="col-6">
+                                                <label class="form-label"> Tem&aacute;tica </label>
+                                                <select name="tematica[]" id="tematica" class="form-control">
+                                                    <option value="">Seleccione una tem&aacute;tica</option>
+                                                    <?php
+                                                    $consulta = "SELECT * from tematica where estado = 'A' ";
+                                                    $data = Conexion::buscarVariosRegistro($consulta);
+                                                    if ($data) {
+                                                        foreach ($data as $d) { ?>
+                                                            <option value="<?php echo $d['cod_tematica'] ?>"> <?php echo $d['nombre'] ?> </option>
+                                                    <?php }
+                                                    } ?>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-6">
+                                                <label class="form-label"> M&oacute;dulo </label>
+                                                <select name="modulo[]" id="modulo" class="form-control">
+                                                    <option value="">Seleccione una m&oacute;dulo</option>
+                                                    <?php
+                                                    $consulta = "SELECT * from modulo where estado = 'A' ";
+                                                    $data = Conexion::buscarVariosRegistro($consulta);
+                                                    if ($data) {
+                                                        foreach ($data as $d) { ?>
+                                                            <option value="<?php echo $d['cod_modulo'] ?>"> <?php echo $d['nombre'] ?> </option>
+                                                    <?php }
+                                                    } ?>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-6">
+                                                <label class="form-label"> Medici&oacute;n </label>
+                                                <select name="medicion[]" id="medicion" class="form-control">
+                                                    <option value="">Seleccione una medici&oacute;n </option>
+                                                    <?php
+                                                    $consulta = "SELECT * from medicion where estado = 'A' ";
+                                                    $data = Conexion::buscarVariosRegistro($consulta);
+                                                    if ($data) {
+                                                        foreach ($data as $d) { ?>
+                                                            <option value="<?php echo $d['cod_medicion'] ?>"> <?php echo $d['nombre'] ?> </option>
+                                                    <?php }
+                                                    } ?>
+                                                </select>
+                                            </div>
+
+                                        </div>
+                                        <br>
+                                        <hr><br>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
 
                         <div class="d-flex justify-content-end mt-4">
                             <button type="submit" name="button" class="btn bg-gradient-primary m-0 ms-2"> Crear </button>
@@ -98,8 +141,9 @@ $titulo = "Oficinas";
                                                     <tr>
                                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre</th>
                                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ">Direcci&oacute;n</th>
-                                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Correo</th>
-                                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sucursal</th>
+                                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tem&aacute;tica</th>
+                                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">M&oacute;dulo</th>
+                                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Medici&oacute;n</th>
                                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Editar</th>
                                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Eliminar</th>
                                                         <th class="text-secondary opacity-7"></th>
@@ -142,27 +186,54 @@ $titulo = "Oficinas";
 
                         <div class="row">
                             <div class="col-6">
-                                <label for="" class="col-form-label"> Nombre </label>
-                                <input type="text" class="form-control" id="nombreEditar" name="nombre">
+                                <label for="" class="col-form-label"> Pregunta </label>
+                                <input type="text" class="form-control" id="preguntaEditar" name="pregunta">
                             </div>
                             <div class="col-6">
                                 <label for="" class="col-form-label"> Descripci&oacute;n </label>
                                 <input type="text" class="form-control" id="descripcionEditar" name="descripcion">
                             </div>
+
                             <div class="col-6">
-                                <label for="" class="col-form-label"> Correo </label>
-                                <input type="text" class="form-control" id="correoEditar" name="correo">
-                            </div>
-                            <div class="col-6">
-                                <label for="" class="col-form-label"> Sucursal </label>
-                                <select name="sucursal" id="sucursalEditar" class="form-control">
-                                    <option value="">Seleccionar sucursal</option>
+                                <label for="" class="col-form-label"> Tem&aacute;tica </label>
+                                <select name="tematica" id="tematicaEditar" class="form-control">
+                                    <option value="">Seleccionar tem&aacute;tica</option>
                                     <?php
-                                    $consulta = "SELECT * from sucursal where estado = 'A' ";
+                                    $consulta = "SELECT * from tematica where estado = 'A' ";
                                     $data = Conexion::buscarVariosRegistro($consulta);
                                     if ($data) {
                                         foreach ($data as $d) { ?>
-                                            <option value="<?php echo $d['cod_sucursal'] ?>"> <?php echo $d['nombre'] ?> </option>
+                                            <option value="<?php echo $d['cod_tematica'] ?>"> <?php echo $d['nombre'] ?> </option>
+                                    <?php }
+                                    } ?>
+                                </select>
+                            </div>
+
+                            <div class="col-6">
+                                <label for="" class="col-form-label"> M&oacute;dulo </label>
+                                <select name="modulo" id="moduloEditar" class="form-control">
+                                    <option value="">Seleccionar m&oacute;dulo </option>
+                                    <?php
+                                    $consulta = "SELECT * from modulo where estado = 'A' ";
+                                    $data = Conexion::buscarVariosRegistro($consulta);
+                                    if ($data) {
+                                        foreach ($data as $d) { ?>
+                                            <option value="<?php echo $d['cod_modulo'] ?>"> <?php echo $d['nombre'] ?> </option>
+                                    <?php }
+                                    } ?>
+                                </select>
+                            </div>
+
+                            <div class="col-6">
+                                <label for="" class="col-form-label"> Medici&oacute;n </label>
+                                <select name="medicion" id="medicionEditar" class="form-control">
+                                    <option value="">Seleccionar medici&oacute;n </option>
+                                    <?php
+                                    $consulta = "SELECT * from medicion where estado = 'A' ";
+                                    $data = Conexion::buscarVariosRegistro($consulta);
+                                    if ($data) {
+                                        foreach ($data as $d) { ?>
+                                            <option value="<?php echo $d['cod_medicion'] ?>"> <?php echo $d['nombre'] ?> </option>
                                     <?php }
                                     } ?>
                                 </select>
@@ -186,6 +257,80 @@ $titulo = "Oficinas";
     <?php include 'script.php' ?>
 
     <script>
+        $(document).ready(function() {
+            tabla = $('#formPr');
+            tr = $('tr:first', tabla);
+            $('#btnDuplicar').on('click', function() {
+                var disenoformulario = `<div id="frm1" class="row">
+
+                        <div class="col-6">
+                            <label class="form-label"> Pregunta </label>
+                            <input class="form-control" type="text" placeholder="Pregunta" id="pregunta" name="pregunta[]">
+                        </div>
+
+                        <div class="col-6">
+                            <label class="form-label"> Descripci&oacute;n </label>
+                            <input class="form-control" type="text" placeholder="Descripci&oacute;n" id="descripcion" name="descripcion[]">
+                        </div>
+
+                        <div class="col-6">
+                            <label class="form-label"> Tem&aacute;tica </label>
+                            <select name="tematica[]" id="tematica" class="form-control">
+                                <option value="">Seleccione una tem&aacute;tica</option>
+                                <?php
+                                $consulta = "SELECT * from tematica where estado = 'A' ";
+                                $data = Conexion::buscarVariosRegistro($consulta);
+                                if ($data) {
+                                    foreach ($data as $d) { ?>
+                                        <option value="<?php echo $d['cod_tematica'] ?>"> <?php echo $d['nombre'] ?> </option>
+                                <?php }
+                                } ?>
+                            </select>
+                        </div>
+
+                        <div class="col-6">
+                            <label class="form-label"> M&oacute;dulo </label>
+                            <select name="modulo[]" id="modulo" class="form-control">
+                                <option value="">Seleccione una m&oacute;dulo</option>
+                                <?php
+                                $consulta = "SELECT * from modulo where estado = 'A' ";
+                                $data = Conexion::buscarVariosRegistro($consulta);
+                                if ($data) {
+                                    foreach ($data as $d) { ?>
+                                        <option value="<?php echo $d['cod_modulo'] ?>"> <?php echo $d['nombre'] ?> </option>
+                                <?php }
+                                } ?>
+                            </select>
+                        </div>
+
+                        <div class="col-6">
+                            <label class="form-label"> Medici&oacute;n </label>
+                            <select name="medicion[]" id="medicion" class="form-control">
+                                <option value="">Seleccione una medici&oacute;n </option>
+                                <?php
+                                $consulta = "SELECT * from medicion where estado = 'A' ";
+                                $data = Conexion::buscarVariosRegistro($consulta);
+                                if ($data) {
+                                    foreach ($data as $d) { ?>
+                                        <option value="<?php echo $d['cod_medicion'] ?>"> <?php echo $d['nombre'] ?> </option>
+                                <?php }
+                                } ?>
+                            </select>
+                        </div>
+
+                        </div>
+                        <br><hr><br>
+                        `;
+                tr.clone().appendTo(tabla).find('td').html(disenoformulario);
+            });
+
+            $("#btnEliminarDuplicado").on('click', function() {
+                $('#formPr tr:last').remove();
+            });
+        });
+
+        // 
+
         var limite = "5";
         var pagina = "1";
 
@@ -226,12 +371,16 @@ $titulo = "Oficinas";
             }
 
             if (paso) {
+                // swal("ERROR", "oki", "success");
                 var formData = new FormData(document.getElementById("formulario"));
                 formData.append('tipo', "CREAR");
                 formData.append('cod_usuario', $('#cod_usuario').val());
-                
+
+                for (let [key, value] of formData.entries()) {
+                    console.log(key, ':', value);
+                }
                 $.ajax({
-                    url: "dist/ajax/oficina.php",
+                    url: "dist/ajax/pregunta.php",
                     type: "POST",
                     dataType: "json",
                     data: formData,
@@ -241,6 +390,11 @@ $titulo = "Oficinas";
                     error: function(mensaje, exception) {
                         console.log(mensaje.responseText);
                         swal("ERROR", "Por favor recarga la pagina, si el problema persiste contacta con soporte", "error");
+                    },
+                    beforeSend: () => {
+                        $("#formulario").find("button[type=submit]").prop({
+                            disabled: true
+                        }).html("Creando...");
                     },
                     success: function(response) {
                         console.log(response);
@@ -252,7 +406,13 @@ $titulo = "Oficinas";
                         } else {
                             swal("error!", response['mensaje'], "error");
                         }
+                    },
+                    complete: () => {
+                        $("#formulario").find("button[type=submit]").prop({
+                            disabled: false
+                        }).html("Crear");
                     }
+
                 });
             }
         });
@@ -273,7 +433,7 @@ $titulo = "Oficinas";
             $.ajax({
                 beforeSend: function() {},
                 type: "POST",
-                url: "dist/ajax/oficina.php",
+                url: "dist/ajax/pregunta.php",
                 dataType: 'json',
                 data: formData,
                 cache: false,
@@ -303,23 +463,26 @@ $titulo = "Oficinas";
             var codigo = "";
             var nombre = "";
             var descripcion = "";
-            var correo = "";
-            var sucursal = "";
+            var tematica = "";
+            var modulo = "";
+            var medicion = "";
 
             var dataBody = "";
             $.each(data, function(item, valor) {
-                codigo = data[item]['cod_oficina'];
-                nombre = data[item]['oficina'];
+                codigo = data[item]['cod_pregunta'];
+                nombre = data[item]['pregunta'];
                 descripcion = data[item]['descripcion'];
-                correo = data[item]['correo'];
-                sucursal = data[item]['sucursal'];
+                tematica = data[item]['tematica'];
+                modulo = data[item]['modulo'];
+                medicion = data[item]['medicion'];
 
                 dataBody += `
                         <tr>
                             <td class="align-middle text-center"> <p class="text-secondary text-xxs font-weight-bolder"> ${nombre} </p>   </td>
                             <td class="align-middle text-center"> <p class="text-secondary text-xxs font-weight-bolder"> ${descripcion} </p>   </td>
-                            <td class="align-middle text-center"> <p class="text-secondary text-xxs font-weight-bolder"> ${correo} </p>   </td>
-                            <td class="align-middle text-center"> <p class="text-secondary text-xxs font-weight-bolder"> ${sucursal} </p>   </td>
+                            <td class="align-middle text-center"> <p class="text-secondary text-xxs font-weight-bolder"> ${tematica} </p>   </td>
+                            <td class="align-middle text-center"> <p class="text-secondary text-xxs font-weight-bolder"> ${modulo} </p>   </td>
+                            <td class="align-middle text-center"> <p class="text-secondary text-xxs font-weight-bolder"> ${medicion} </p>   </td>
                             <td class="align-middle text-center">   <button class="btn btn-info"   onclick="abrirModal(${codigo});"> <i class="fas fa-pencil-alt"></i> </button>   </td>
                             <td class="align-middle text-center">   <button class="btn btn-danger" onclick="eliminar(${codigo});"> <i class="fas fa-trash"></i>  </button>   </td>
                         </tr>
@@ -357,7 +520,7 @@ $titulo = "Oficinas";
             $.ajax({
                 beforeSend: function() {},
                 type: "POST",
-                url: "dist/ajax/oficina.php",
+                url: "dist/ajax/pregunta.php",
                 dataType: 'json',
                 data: formData,
                 cache: false,
@@ -372,10 +535,11 @@ $titulo = "Oficinas";
                     if (response['status'] == 'correcto') {
                         $('#modalEditar').modal('show');
                         $('#codigo').val(response['codigo']);
-                        $('#nombreEditar').val(response['nombre']);
+                        $('#preguntaEditar').val(response['pregunta']);
                         $('#descripcionEditar').val(response['descripcion']);
-                        $('#correoEditar').val(response['correo']);
-                        $('#sucursalEditar').val(response['cod_sucursal']);
+                        $('#tematicaEditar').val(response['tematica']);
+                        $('#moduloEditar').val(response['modulo']);
+                        $('#medicionEditar').val(response['medicion']);
 
                     } else if (response['status'] == 'informacion') {
                         $('#modalEditar').modal('hide');
@@ -416,9 +580,9 @@ $titulo = "Oficinas";
                 var formData = new FormData(document.getElementById("frmActualizar"));
                 formData.append('tipo', "ACTUALIZAR");
                 formData.append('cod_usuario', $('#cod_usuario').val());
-                
+
                 $.ajax({
-                    url: "dist/ajax/oficina.php",
+                    url: "dist/ajax/pregunta.php",
                     type: "POST",
                     dataType: "json",
                     data: formData,
@@ -428,6 +592,11 @@ $titulo = "Oficinas";
                     error: function(mensaje, exception) {
                         console.log(mensaje.responseText);
                         swal("ERROR", "Por favor recarga la pagina, si el problema persiste contacta con soporte", "error");
+                    },
+                    beforeSend: () => {
+                        $("#frmActualizar").find("button[type=submit]").prop({
+                            disabled: true
+                        }).html("Actualizando...");
                     },
                     success: function(response) {
                         console.log(response);
@@ -444,6 +613,12 @@ $titulo = "Oficinas";
                             $('#modalEditar').modal('hide');
                             swal("error", response['mensaje'], "error");
                         }
+
+                    },
+                    complete: () => {
+                        $("#frmActualizar").find("button[type=submit]").prop({
+                            disabled: false
+                        }).html("Actualizar");
                     }
                 });
             }

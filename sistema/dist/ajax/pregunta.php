@@ -1,8 +1,8 @@
 <?php
 require_once "../../conexion.php";
-require_once "class/c_modulo.php";
+require_once "class/c_pregunta.php";
 
-$objeto = new Modulo();
+$objeto = new Pregunta();
 
 $tipo = $_POST['tipo'];
 switch($tipo){
@@ -10,6 +10,7 @@ switch($tipo){
 
         $return    = $objeto->crear($_POST);
         break;   
+        
     case "LISTA":
         
         $return = $objeto->lista($_POST);

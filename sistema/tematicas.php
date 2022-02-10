@@ -4,8 +4,9 @@ session_start();
 if ($_SESSION['datos_login'] == "") {
   header("Location: ../sistema/");
 }
-$titulo = "Oficinas";
+$titulo = "Tem&aacute;ticas";
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -47,32 +48,11 @@ $titulo = "Oficinas";
                     <form class="form-control dropzone" id="formulario">
                         <div class="card-header pb-0"> </div>
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-12">
                                 <label class="form-label"> Nombre </label>
                                 <input class="form-control" type="text" placeholder="Nombre" id="nombre" name="nombre">
                             </div>
-                            <div class="col-6">
-                                <label class="form-label"> Descripci&oacute;n </label>
-                                <input class="form-control" type="text" placeholder="Descripci&oacute;n" id="descripcion" name="descripcion">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label"> Correo </label>
-                                <input class="form-control" type="email" placeholder="Correo" id="correo" name="correo">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label"> Sucursal </label>
-                                <select name="sucursal" id="sucursal" class="form-control">
-                                    <option value="">Seleccione una sucursal</option>
-                                    <?php
-                                    $consulta = "SELECT * from sucursal where estado = 'A' ";
-                                    $data = Conexion::buscarVariosRegistro($consulta);
-                                    if ($data) {
-                                        foreach ($data as $d) { ?>
-                                            <option value="<?php echo $d['cod_sucursal'] ?>"> <?php echo $d['nombre'] ?> </option>
-                                    <?php }
-                                    } ?>
-                                </select>
-                            </div>
+
                         </div>
 
                         <div class="d-flex justify-content-end mt-4">
@@ -97,9 +77,6 @@ $titulo = "Oficinas";
                                                 <thead>
                                                     <tr>
                                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre</th>
-                                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ">Direcci&oacute;n</th>
-                                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Correo</th>
-                                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sucursal</th>
                                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Editar</th>
                                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Eliminar</th>
                                                         <th class="text-secondary opacity-7"></th>
@@ -141,41 +118,18 @@ $titulo = "Oficinas";
                         <input type="hidden" id="codigo" name="codigo" value="">
 
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-12">
                                 <label for="" class="col-form-label"> Nombre </label>
                                 <input type="text" class="form-control" id="nombreEditar" name="nombre">
                             </div>
-                            <div class="col-6">
-                                <label for="" class="col-form-label"> Descripci&oacute;n </label>
-                                <input type="text" class="form-control" id="descripcionEditar" name="descripcion">
-                            </div>
-                            <div class="col-6">
-                                <label for="" class="col-form-label"> Correo </label>
-                                <input type="text" class="form-control" id="correoEditar" name="correo">
-                            </div>
-                            <div class="col-6">
-                                <label for="" class="col-form-label"> Sucursal </label>
-                                <select name="sucursal" id="sucursalEditar" class="form-control">
-                                    <option value="">Seleccionar sucursal</option>
-                                    <?php
-                                    $consulta = "SELECT * from sucursal where estado = 'A' ";
-                                    $data = Conexion::buscarVariosRegistro($consulta);
-                                    if ($data) {
-                                        foreach ($data as $d) { ?>
-                                            <option value="<?php echo $d['cod_sucursal'] ?>"> <?php echo $d['nombre'] ?> </option>
-                                    <?php }
-                                    } ?>
-                                </select>
-                            </div>
-
                         </div>
+
 
                         <div class="modal-footer">
                             <button type="submit" name="button" class="btn bg-gradient-primary m-0 ms-2">Actualizar</button>
                         </div>
                     </form>
                 </div>
-
             </div>
         </div>
     </div>
@@ -213,13 +167,6 @@ $titulo = "Oficinas";
                         $(item).removeClass("is-invalid")
                     }
                 });
-
-                $(this).find("select#sucursal").each(function(index, item) {
-                    if ($(item).val() == 0 || $(item).val() == null) {
-                        throw 'Debes escoger opciones';
-                    }
-                })
-
             } catch (error) {
                 swal("ERROR", error, "error");
                 paso = !paso
@@ -229,9 +176,9 @@ $titulo = "Oficinas";
                 var formData = new FormData(document.getElementById("formulario"));
                 formData.append('tipo', "CREAR");
                 formData.append('cod_usuario', $('#cod_usuario').val());
-                
+
                 $.ajax({
-                    url: "dist/ajax/oficina.php",
+                    url: "dist/ajax/tematica.php",
                     type: "POST",
                     dataType: "json",
                     data: formData,
@@ -255,8 +202,8 @@ $titulo = "Oficinas";
                     }
                 });
             }
-        });
 
+        });
 
         // LISTA
         function cargarLista(limite, pagina) {
@@ -273,7 +220,7 @@ $titulo = "Oficinas";
             $.ajax({
                 beforeSend: function() {},
                 type: "POST",
-                url: "dist/ajax/oficina.php",
+                url: "dist/ajax/tematica.php",
                 dataType: 'json',
                 data: formData,
                 cache: false,
@@ -308,18 +255,12 @@ $titulo = "Oficinas";
 
             var dataBody = "";
             $.each(data, function(item, valor) {
-                codigo = data[item]['cod_oficina'];
-                nombre = data[item]['oficina'];
-                descripcion = data[item]['descripcion'];
-                correo = data[item]['correo'];
-                sucursal = data[item]['sucursal'];
+                codigo = data[item]['cod_tematica'];
+                nombre = data[item]['nombre'];
 
                 dataBody += `
                         <tr>
                             <td class="align-middle text-center"> <p class="text-secondary text-xxs font-weight-bolder"> ${nombre} </p>   </td>
-                            <td class="align-middle text-center"> <p class="text-secondary text-xxs font-weight-bolder"> ${descripcion} </p>   </td>
-                            <td class="align-middle text-center"> <p class="text-secondary text-xxs font-weight-bolder"> ${correo} </p>   </td>
-                            <td class="align-middle text-center"> <p class="text-secondary text-xxs font-weight-bolder"> ${sucursal} </p>   </td>
                             <td class="align-middle text-center">   <button class="btn btn-info"   onclick="abrirModal(${codigo});"> <i class="fas fa-pencil-alt"></i> </button>   </td>
                             <td class="align-middle text-center">   <button class="btn btn-danger" onclick="eliminar(${codigo});"> <i class="fas fa-trash"></i>  </button>   </td>
                         </tr>
@@ -357,7 +298,7 @@ $titulo = "Oficinas";
             $.ajax({
                 beforeSend: function() {},
                 type: "POST",
-                url: "dist/ajax/oficina.php",
+                url: "dist/ajax/tematica.php",
                 dataType: 'json',
                 data: formData,
                 cache: false,
@@ -373,9 +314,6 @@ $titulo = "Oficinas";
                         $('#modalEditar').modal('show');
                         $('#codigo').val(response['codigo']);
                         $('#nombreEditar').val(response['nombre']);
-                        $('#descripcionEditar').val(response['descripcion']);
-                        $('#correoEditar').val(response['correo']);
-                        $('#sucursalEditar').val(response['cod_sucursal']);
 
                     } else if (response['status'] == 'informacion') {
                         $('#modalEditar').modal('hide');
@@ -401,24 +339,17 @@ $titulo = "Oficinas";
                         $(item).removeClass("is-invalid")
                     }
                 });
-
-                $(this).find("select#sucursalEditar").each(function(index, item) {
-                    if ($(item).val() == 0 || $(item).val() == null) {
-                        throw 'Debes escoger opciones';
-                    }
-                });
             } catch (error) {
                 swal("ERROR", error, "error");
                 paso = !paso
             }
-
             if (paso) {
                 var formData = new FormData(document.getElementById("frmActualizar"));
                 formData.append('tipo', "ACTUALIZAR");
                 formData.append('cod_usuario', $('#cod_usuario').val());
-                
+
                 $.ajax({
-                    url: "dist/ajax/oficina.php",
+                    url: "dist/ajax/tematica.php",
                     type: "POST",
                     dataType: "json",
                     data: formData,
@@ -447,6 +378,7 @@ $titulo = "Oficinas";
                     }
                 });
             }
+
         });
 
         $('#CerrarModalEditar').click(function() {
@@ -461,7 +393,7 @@ $titulo = "Oficinas";
             formData.append('codigo', codigo);
 
             $.ajax({
-                url: "dist/ajax/oficina.php",
+                url: "dist/ajax/tematica.php",
                 type: "POST",
                 dataType: "json",
                 data: formData,
