@@ -1,7 +1,10 @@
-<?php
+<?php 
 require_once "conexion.php";
-$titulo = "Medici&oacute;n";
-$cod_usuario = 1;
+session_start();
+if ($_SESSION['datos_login'] == "") {
+  header("Location: ../sistema/");
+}
+$titulo = "Mediciones";
 ?>
 
 <!DOCTYPE html>

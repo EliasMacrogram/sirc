@@ -1,6 +1,10 @@
-<?php
-$titulo = "Sucursal";
-$cod_usuario = 1;
+<?php 
+require_once "conexion.php";
+session_start();
+if ($_SESSION['datos_login'] == "") {
+  header("Location: ../sistema/");
+}
+$titulo = "Sucursales";
 ?>
 
 <!DOCTYPE html>

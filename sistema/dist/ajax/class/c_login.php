@@ -11,6 +11,7 @@ class Login
 
         $query = Conexion::buscarRegistro("SELECT * from usuarios where usuario = '$usuario' and password = '$password' ");
         if ($query) {
+            session_start();
             $respuesta['status'] = "correcto";
             $respuesta['mensaje'] = "";
             $_SESSION['datos_login'] = array(
@@ -34,14 +35,24 @@ class Login
         $correo = $_POST['correo'];
         $data = Conexion::buscarRegistro("SELECT * from usuarios where correo = '$correo' ");
         if ($data) {
-            $password = rand(50, 10000);
-            $passwordTemporal = sha1($password);
+            // $password = rand(50, 10000);
+            $password = 123;
+            $rijndael = new RijndaelOpenSSL();
+            $passwordTemporal = $password;
+            $password = base64_encode($rijndael->encrypt($password, "F@R_pa$$"));
 
-            $consulta = "UPDATE usuarios set password = '$passwordTemporal', fecha_actualizado = now(), usuario_actualizado = 'RECUPERAR_PASSWORD' where cod_usuario = " . $data['cod_usuario'];
+            $consulta = "UPDATE usuarios set password = '$password', fecha_actualizado = now(), usuario_actualizado = 'RECUPERAR_PASSWORD' where cod_usuario = " . $data['cod_usuario'];
             $query = Conexion::UpdateRegistro($consulta);
             if ($query) {
-                $respuesta['status'] = "correcto";
-                $respuesta['mensaje'] = "Tu contraseña temporal es " . $password;
+                $objetoCorreo = new Correo();
+                $validar = $objetoCorreo->crearUsuario($data['correo']);
+                if ($validar) {
+                    $respuesta['status'] = "correcto";
+                    $respuesta['mensaje'] = "Tu contraseña temporal es " . $passwordTemporal . " Revisa tu coreo " . $data['correo'];
+                } else {
+                    $respuesta['status'] = "error";
+                    $respuesta['mensaje'] = "No se pudo enviar el correo, por favor solicita otra clave";
+                }
             } else {
                 $respuesta['status'] = "error";
                 $respuesta['mensaje'] = "Error al generar clave temporal, vuelve a intentarlo";
@@ -67,10 +78,10 @@ class Login
         if (filter_var($correo, FILTER_VALIDATE_EMAIL)) {
             $data = Conexion::buscarRegistro("SELECT * from usuarios where usuario = '$usuario' or correo = '$correo'  ");
             if ($data) {
-                if($data['usuario'] == $usuario){
+                if ($data['usuario'] == $usuario) {
                     $respuesta['status'] = "informacion";
                     $respuesta['mensaje'] = "Ese usuario ya existe en el sistema";
-                }else{
+                } else {
                     $respuesta['status'] = "informacion";
                     $respuesta['mensaje'] = "Ese correo ya existe en el sistema";
                 }
@@ -91,6 +102,16 @@ class Login
             $respuesta['status'] = "error";
             $respuesta['mensaje'] = "El correo no tiene el formato correcto";
         }
+        return $respuesta;
+    }
+
+    function cerrarSesion()
+    {
+        session_start();
+        unset($_SESSION['datos_login']);
+        // header("Location: ../../");
+        session_destroy();
+        $respuesta['status'] = "correcto";
         return $respuesta;
     }
 }

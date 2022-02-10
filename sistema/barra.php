@@ -38,7 +38,8 @@
                         </a>
                         <ul class="dropdown-menu  dropdown-menu-end  px-2 py-3 me-sm-n4" aria-labelledby="dropdownMenuButton">
                             <li class="mb-2">
-                                <a href="cerrar-sesion.php" class="dropdown-item border-radius-md"> Cerrar sesi&oacute;n </a> 
+                                <button id="btnCerrar" class="dropdown-item border-radius-md"> Salir </button>
+                                <!-- <a href="cerrar-sesion.php" class="dropdown-item border-radius-md"> Cerrar sesi&oacute;n </a>  -->
                             </li>
                          
                         </ul>

@@ -3,6 +3,7 @@
 require_once "../../conexion.php";
 require_once "class/c_login.php";
 require_once "cryptDecrypt.php";
+require_once "correo.php";
 
 $objeto = new Login();
 
@@ -18,7 +19,11 @@ switch($tipo){
 
     case "CREAR":
         $return = $objeto->crear($_POST);
-        break;   
+        break;  
+
+    case "CERRAR_SESION":     
+        $return = $objeto->cerrarSesion();
+        break;  
 }
 
 header("Content-Type:Application/json");

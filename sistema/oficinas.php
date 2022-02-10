@@ -1,9 +1,11 @@
-<?php
+<?php 
 require_once "conexion.php";
-$titulo = "Oficina";
-$cod_usuario = 1;
+session_start();
+if ($_SESSION['datos_login'] == "") {
+  header("Location: ../sistema/");
+}
+$titulo = "Oficinas";
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
